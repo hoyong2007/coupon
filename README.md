@@ -8,7 +8,7 @@
 
 핵심 취약점은 init() 함수부분에 있다.
 
-![img](.\README.assets\Untitled-1608120289794.png) 
+![img](./README.assets/Untitled-1608120289794.png) 
 
 쿠폰을 암호화 할때 AES-GCM을 사용하는데, 이때 init() 함수에서 iv 값인 a1+545 부분을 get_rand_bytes() 함수를 통해 랜덤 값으로 초기화 하는데, init() 이후에는 iv값이 변경되지 않아 두 개의 쿠폰을 발급받게 되면 같은 iv값을 사용해 암호화를 하게 된다. 
 
@@ -16,37 +16,37 @@
 
 ### 풀이
 
-![img](.\README.assets\Untitled.png) 
+![img](./README.assets/Untitled.png) 
 
 aes-gcm모드의 구조를 보면 iv 값과 key 값이 같다면 암호화에 사용하는 key stream이 같게 된다. 
 
 이때 생성되는 key stream과 plaintext를 단순히 xor 함으로써 암호화를 진행하기 때문에 암호문-평문쌍을 알고있다면 해당 key stream을 이용해 원하는 평문을 암호화한 암호문을 구할 수 있다.
 
-![1608120177023](.\README.assets\1608120177023.png)
+![1608120177023](./README.assets/1608120177023.png)
 
 이를 이용해 쿠폰의 present 부분이 flag인 쿠폰을 생성할 수 있다. 그러나 쿠폰을 사용하려면 생성된 쿠폰에 대한 valid한 tag 값이 필요하다.
 
 Auth Tag는 평문 블럭이 N개일때 다음과 같이 해시키 **H**에 대한 다항식으로 표현할 수 있다.
 
-![1608120206250](.\README.assets\1608120206250.png)
+![1608120206250](./README.assets/1608120206250.png)
 
 임의의 암호문을 만들었을 때 valid한 tag값 **T**를 계산하려면 $E_k$와 **H**를 알아야 한다. 
 
 이때, 같은 iv값을 사용해 같은 $E_k$ 값을 갖는 두 개의 **(C,T)** 쌍을 갖고 있다면 아래와 같이  $E_k$를 제거할 수 있다.
 
-![1608120224315](.\README.assets\1608120224315.png)
+![1608120224315](./README.assets/1608120224315.png)
 
 이렇게 얻어진 **H**에 대한 N+2차 다항식의 해를 구하면 해시키를 구할 수 있다.
 
 해시키 H 값을 구했으면 아래와 같이 임의의 암호문에 대한 valid한 tag값을 계산할 수 있다.
 
-![1608120354259](.\README.assets\1608120354259.png)
+![1608120354259](./README.assets/1608120354259.png)
 
 위 연산은 $GF(2^{128})$ 위에서 이루어진다는 것에 유의해야 한다.
 
 이렇게 present 부분이 flag인 쿠폰과 이 쿠폰의 tag값을 생성했으면 이를 제출해 flag를 읽을 수 있다.
 
-![img](.\README.assets\Untitled-1608120384634.png) 
+![img](./README.assets/Untitled-1608120384634.png) 
 
 ### 풀이 코드
 
