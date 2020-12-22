@@ -152,12 +152,12 @@ void get_wishes(struct aes_gcm_ctx *coupon)
 
 	if(strstr(name, "flag") != NULL || strstr(gift, "flag") != NULL) {
     	printf("That's not for you~~\n");
-    	exit(-1);
+    	exit(0);
     }
 
     if (!check_str(name) || !check_str(gift)) {
     	printf("Bad kid nono...\n");
-    	exit(-1);
+    	exit(0);
     }
 
     len = strlen(tmp);
@@ -194,7 +194,7 @@ void get_coupon(struct aes_gcm_ctx *coupon)
 	
 	if (tmp_len%2 != 0) {
 		printf("Coupon must be an even-length string!!\n");
-		exit(-1);
+		exit(0);
 	}
 	coupon->couponLen = tmp_len/2;
 	hex_to_bytes(coupon->coupon, tmp_coupon, coupon->couponLen);
@@ -203,7 +203,7 @@ void get_coupon(struct aes_gcm_ctx *coupon)
 	tmp_len = read_wrapper(0, tmp_tag, 0x20);
 	if (tmp_len != 0x20) {
 		printf("Tag must be 16 bytes hex string!!\n");
-		exit(-1);
+		exit(0);
 	}
 	hex_to_bytes(coupon->tag, tmp_tag, TAG_SIZE);
 }
@@ -212,7 +212,7 @@ void read_coupon(struct aes_gcm_ctx *coupon)
 {
 	if (aes_gcm_decrypt(coupon) <= 0) {
 		printf("Maybe this coupon is expired...\n");
-		exit(-1);
+		exit(0);
 	}
 	printf("\n===== coupon contents =====\n");
 	printf("%s", coupon->present);
@@ -263,7 +263,7 @@ int main()
 		else if (select == 2) {
 			if (gift_cnt >= 2) {
 				printf("You such a greedy!!!\n");
-				exit(-1);
+				exit(0);
 			}
 			else {
 				init_coupon(&coupon);
